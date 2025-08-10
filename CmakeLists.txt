@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 3.10)
+project(braw2ilpd)
+
+set(CMAKE_CXX_STANDARD 17)
+
+# Set the SDK path. Please modify according to your actual path.
+set(BRAW_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Blackmagic RAW SDK/")
+
+
+# Platform-specific configuration
+if(APPLE)
+    message(STATUS "Building for macOS")
+    set(BRAW_SDK_PATH_PLATFORM "${BRAW_SDK_PATH}/Mac")
+    if(NOT EXISTS "${BRAW_SDK_PATH_PLATFORM}/Include/BlackmagicRawAPI.h")
+        message(FATAL_ERROR "Blackmagic RAW SDK not found at ${BRAW_SDK_PATH_PLATFORM}. Please ensure the SDK is correctly placed.")
+    endif()
+
+    # macOS-specific settings
+    set(BRAW_INCLUDE_PATH "${BRAW_SDK_PATH_PLATFORM}/Include")
+    set(BRAW_FRAMEWORK "${BRAW_SDK_PATH_PLATFORM}/Libraries/BlackmagicRawAPI.framework")
+endif()
+
+# Create executable
+add_executable(braw2ilpd 
+    braw2ilpd.cpp
+)
+# Include directories
+target_include_directories(braw2ilpd PRIVATE "${BRAW_INCLUDE_PATH}")
+
+if(APPLE)
+    # Set link libraries for macOS
+    target_link_libraries(braw2ilpd PRIVATE 
+        "${BRAW_FRAMEWORK}"
+        "-framework Foundation"
+    )
+    # Copy framework to build directory
+    add_custom_command(TARGET braw2ilpd POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${BRAW_FRAMEWORK}"
+        "${CMAKE_CURRENT_BINARY_DIR}/BlackmagicRawAPI.framework"
+        COMMENT "Copying BlackmagicRawAPI.framework to build directory"
+    )
+
+elseif(WIN32)
+    message(FATAL_ERROR "Windows platform is not yet implemented. Please use macOS for building.")
+
+elseif(UNIX AND NOT APPLE)
+    message(FATAL_ERROR "Linux platform is not yet implemented. Please use macOS for building.")
+
+else()
+    message(FATAL_ERROR "Unsupported platform. Please use macOS for building.")
+
+endif()
