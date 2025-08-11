@@ -33,21 +33,33 @@ Then choose one of the following methods:
 ### Basic Usage
 
 ```bash
-./braw2ilpd <input.braw> <output.ilpd>
-```
-Or use the `-a` or `--all` option to extract all immersive attributes to an additional .txt file:
+# Extract ILPD with automatic naming (recommended)
+./braw2ilpd <input.braw>
+# Creates: [cameraID].[uuid].ilpd in current directory
 
-```bash
-./braw2ilpd <input.braw> <output.ilpd> -a
-# or
-./braw2ilpd <input.braw> <output.ilpd> --all
+# Specify custom ilpd filename
+./braw2ilpd <input.braw> -o <custom_profile_name.ilpd>
+# Creates: custom_profile_name.ilpd in current directory
+
+# Specify output directory (keeps automatic naming)
+./braw2ilpd <input.braw> -o </path/to/output/>
+# Creates: /path/to/output/[cameraID].[uuid].ilpd
+
+# Extract with detailed attributes file
+./braw2ilpd <input.braw> -a
+# Creates two files:
+# [cameraID].[uuid].ilpd
+# [cameraID].[uuid]_detailed_attributes.txt
 ```
 
 ### Parameters
 
 - `<input.braw>`: Path to the input Blackmagic RAW immersive video file
-- `<output.ilpd>`: Path to save the extracted ILPD file
+- `-o, --output <path>`: Specify output file or directory. If omitted, uses automatic naming (`[cameraID].[uuid].ilpd`)
 - `-a, --all`: Optional parameter to also generate a detailed immersive attributes txt file
+- `-v, --verbose`: Enable verbose logging
+- `-s, --silent`: Suppress non-error output
+- `-h, --help`: Show help message
 
 ### Supported Attributes
 
@@ -58,8 +70,8 @@ The `*_detailed_attributes.txt` file contains the following BRAW immersive video
 | OpticalLensProcessingDataFileUUID | UUID of the ILPD file |
 | OpticalILPDFileName | ILPD file name in camera |
 | OpticalInteraxial | Lens optical axis distance |
-| OpticalProjectionKind | Projection type (for Apple Immersive Video, 'fish') |
-| OpticalCalibrationType | Calibration type (for ILPD lens projection, 'meiRives') |
+| OpticalProjectionKind | Projection type ('fish' indicates Apple Immersive Video) |
+| OpticalCalibrationType | Calibration type ('meiRives' indicates ILPD lens projection) |
 | OpticalProjectionData | Actual ILPD data content |
 
 ## Development
@@ -91,7 +103,8 @@ This project uses the Blackmagic RAW SDK. For license information, please refer 
 
 ## Known Issues
 
-- For some braw files, the extracted `OpticalInteraxial` value is 0. This may be caused by a camera firmware bug or an issue with the current reading method.
+- For some BRAW files, the extracted `OpticalInteraxial` value is 0. This may be caused by a camera firmware bug or an issue with the current reading method.
+- In DaVinci Resolve Studio 20.1, ILPD files need to follow the `a.b.ilpd` naming format to be designated to media pool clips. Therefore, using **automatic naming** is recommended (check the `Calibration File Name`, `Calibration UUID` and other options in Media Pool clip properties for more details).
 
 ## References
 

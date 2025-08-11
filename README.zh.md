@@ -31,21 +31,33 @@ ILPD 通常由沉浸相机制造商提供，可能会内嵌在原始摄影机文
 ### 基本用法
 
 ```bash
-./braw2ilpd <input.braw> <output.ilpd>
-```
-或使用 `-a` 或 `--all` 选项将所有沉浸属性提取到额外的 .txt 文件：
+# 提取 ILPD，自动命名（推荐）
+./braw2ilpd <input.braw>
+# 输出：在当前目录生成 [cameraID].[uuid].ilpd 文件
 
-```bash
-./braw2ilpd <input.braw> <output.ilpd> -a
-# 或者
-./braw2ilpd <input.braw> <output.ilpd> --all
+# 指定ilpd文件名
+./braw2ilpd <input.braw> -o <custom_profile_name.ilpd>
+# 输出：在当前目录生成 custom_profile_name.ilpdilpd
+
+# 指定输出目录（保持自动命名）
+./braw2ilpd <input.braw> -o </path/to/output/>
+# 输出：/path/to/output/[cameraID].[uuid].ilpd
+
+# 提取时同时生成详细属性文件
+./braw2ilpd <input.braw> -a
+# 输出两个文件：
+# [cameraID].[uuid].ilpd
+# [cameraID].[uuid]_detailed_attributes.txt
 ```
 
 ### 参数说明
 
 - `<input.braw>`：输入的 Blackmagic RAW 沉浸视频文件路径
-- `<output.ilpd>`：提取出的 ILPD 文件保存路径
+- `-o, --output <path>`：指定输出文件或目录。如果省略，使用自动命名（`[cameraID].[uuid].ilpd`）
 - `-a, --all`：可选参数，同时生成详细沉浸属性 txt 文件
+- `-v, --verbose`：启用详细 log 输出
+- `-s, --silent`：抑制非 error 输出
+- `-h, --help`：显示帮助信息
 
 ### 支持的属性
 
@@ -56,8 +68,8 @@ ILPD 通常由沉浸相机制造商提供，可能会内嵌在原始摄影机文
 | OpticalLensProcessingDataFileUUID | ILPD文件的UUID |
 | OpticalILPDFileName | 机内ILPD文件名 |
 | OpticalInteraxial | 镜头光轴间距 |
-| OpticalProjectionKind | 投影类型（Apple Immersive Video为 'fish'）|
-| OpticalCalibrationType | 标定类型（ILPD 镜头投影为 'meiRives'）|
+| OpticalProjectionKind | 投影类型（'fish'对应Apple Immersive Video）|
+| OpticalCalibrationType | 标定类型（'meiRives'对应ILPD镜头投影）|
 | OpticalProjectionData | 实际ILPD数据内容 |
 
 ## 开发
@@ -89,7 +101,8 @@ make
 
 ## 已知问题
 
-- 某些 braw 文件中提取到的 `OpticalInteraxial` 值为 0，可能是相机固件的 bug，或是当前读取方式存在问题。
+- 某些 BRAW 文件中提取到的 `OpticalInteraxial` 值为 0，可能是相机固件的 bug，或是当前读取方式存在问题。
+- 在 DaVinci Resolve Studio 20.1 中，载入的 ilpd 文件名需要符合 `a.b.ilpd` 的形式，才能被指认到媒体池片段上。因此推荐使用**自动命名**（查看媒体池片段的 `Calibration File Name`、`Calibration UUID` 等选项以获取更多细节）。
 
 ## 参考资料
 
