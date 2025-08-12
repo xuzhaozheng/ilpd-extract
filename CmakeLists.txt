@@ -9,7 +9,10 @@ set(BRAW_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Blackmagic RAW SDK/")
 
 # Platform-specific configuration
 if(APPLE)
-    message(STATUS "Building for macOS")
+    # Set architecture for Universal Binary (Intel + Apple Silicon)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
+    message(STATUS "Building Universal Binary for macOS (x86_64 + arm64)")
+    
     set(BRAW_SDK_PATH_PLATFORM "${BRAW_SDK_PATH}/Mac")
     if(NOT EXISTS "${BRAW_SDK_PATH_PLATFORM}/Include/BlackmagicRawAPI.h")
         message(FATAL_ERROR "Blackmagic RAW SDK not found at ${BRAW_SDK_PATH_PLATFORM}. Please ensure the SDK is correctly placed.")
